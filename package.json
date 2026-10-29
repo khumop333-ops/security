@@ -1,0 +1,20 @@
+{
+  "name": "sentinel-panic-button",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Panic button application for a Pretoria private security company (client + dispatch backend)",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace server & npm run dev --workspace client & wait",
+    "dev:server": "npm run dev --workspace server",
+    "dev:client": "npm run dev --workspace client",
+    "build": "npm run build --workspace client",
+    "start": "npm run start --workspace server"
+  },
+  "engines": {
+    "node": ">=22.5"
+  }
+}

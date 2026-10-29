@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Wireframes — Sentinel Armed Response Panic Button</title>
+<style>
+  :root {
+    --navy: #1C2B45;
+    --alert: #B3261E;
+    --bg: #F5F5F3;
+    --surface: #FFFFFF;
+    --border: #D8D8D3;
+    --ink: #1A1A1A;
+    --muted: #55595F;
+    --wire-fill: #ECECE8;
+    --wire-line: #B9B9B3;
+    --wire-text: #4A4E55;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .doc { max-width: 1180px; margin: 0 auto; padding: 40px 28px 80px; }
+  header.doc-head {
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 20px;
+    margin-bottom: 28px;
+  }
+  h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.01em; }
+  h2 {
+    font-size: 20px; margin: 44px 0 6px; padding-top: 18px;
+    border-top: 1px solid var(--border);
+  }
+  h3 { font-size: 16px; margin: 22px 0 8px; }
+  .sub { color: var(--muted); font-size: 14px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .meta strong { color: var(--ink); }
+
+  .swatches { display: flex; flex-wrap: wrap; gap: 14px; margin: 14px 0 8px; }
+  .swatch {
+    width: 172px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    background: var(--surface); font-size: 12px;
+  }
+  .swatch .chip { height: 56px; }
+  .swatch .info { padding: 8px 10px; }
+  .swatch .name { font-weight: 600; font-size: 13px; }
+
+  .rules { max-width: 780px; }
+  .rules li { margin-bottom: 6px; }
+
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; margin: 18px 0 6px;
+  }
+  .flow .step {
+    flex: 1 1 150px; background: var(--surface); border: 1px solid var(--wire-line);
+    padding: 12px 14px; min-width: 150px;
+  }
+  .flow .step strong { display: block; font-size: 13px; }
+  .flow .step span { font-size: 12px; color: var(--muted); }
+  .flow .arrow {
+    display: flex; align-items: center; padding: 0 8px; color: var(--navy); font-weight: 700;
+  }
+
+  .screens {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 36px; margin-top: 24px;
+  }
+  figure.screen { margin: 0; }
+  figure.screen svg {
+    width: 100%; height: auto; display: block;
+    background: var(--surface); border: 1px solid var(--wire-line); border-radius: 14px;
+  }
+  figcaption { margin-top: 12px; }
+  figcaption h3 { margin: 0 0 6px; font-size: 15px; }
+  .legend { list-style: none; padding: 0; margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+  .legend li { display: flex; gap: 8px; margin-bottom: 5px; }
+  .legend .n {
+    flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--navy); color: #fff; font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; margin-top: 1px;
+  }
+
+  table { border-collapse: collapse; width: 100%; max-width: 860px; background: var(--surface); }
+  th, td { border: 1px solid var(--border); padding: 9px 12px; text-align: left; font-size: 13px; }
+  th { background: var(--navy); color: #fff; font-weight: 600; }
+  .note {
+    max-width: 860px; background: var(--surface); border-left: 4px solid var(--navy);
+    padding: 12px 16px; font-size: 13.5px; margin: 16px 0;
+  }
+  footer.doc-foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--muted); }
+  text { font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif; }
+</style>
+</head>
+<body>
+<div class="doc">
+
+<header class="doc-head">
+  <h1>Wireframes — Panic Button Application</h1>
+  <div class="sub">Sentinel Armed Response (Pty) Ltd — Pretoria, South Africa · Private security panic button for web and mobile</div>
+  <div class="meta">
+    <div><strong>Document</strong> UX wireframes, v1.0</div>
+    <div><strong>Scope</strong> Home/Panic · Confirmation · Status · Profile · History · Settings · Dispatch console</div>
+    <div><strong>Compliance</strong> POPIA (Act 4 of 2013) aware — consent, data minimisation, access requests</div>
+    <div><strong>Status</strong> Approved for prototype build (implemented in this repository)</div>
+  </div>
+</header>
+
+<!-- ================================================================ 1 -->
+<h2>1. Visual language</h2>
+<p class="rules">The interface must read as a serious, established security firm — closer to a banking or medical-alert
+application than a consumer app. The following rules are binding for all screens:</p>
+<ul class="rules">
+  <li>One sans-serif typeface (Inter). Hierarchy is created with <em>weight</em> (regular / medium / semibold / bold), not colour.</li>
+  <li>No gradients, no neon, no glassmorphism, no decorative animation, no illustrations, no emoji.</li>
+  <li>Elevation limited to a subtle 1–2&nbsp;px shadow. Solid fills only.</li>
+  <li>Matte red is reserved exclusively for the panic button and its hold-progress ring — never for warnings, badges or links.</li>
+  <li>Icons are outline style with a single consistent stroke width (1.75&nbsp;px at 24&nbsp;px).</li>
+  <li>Minimum tap target 48×48&nbsp;px; body text minimum 16&nbsp;px; all text meets WCAG&nbsp;AA contrast.</li>
+  <li>Copy is direct, calm and instructional (“Press and hold to alert security”). No playful microcopy.</li>
+</ul>
+
+<div class="swatches">
+  <div class="swatch"><div class="chip" style="background:#1C2B45"></div><div class="info"><div class="name">Deep navy</div>#1C2B45<br/>Primary — header, buttons, active states</div></div>
+  <div class="swatch"><div class="chip" style="background:#B3261E"></div><div class="info"><div class="name">Matte red</div>#B3261E<br/>Panic button only</div></div>
+  <div class="swatch"><div class="chip" style="background:#2B2E33"></div><div class="info"><div class="name">Charcoal</div>#2B2E33<br/>Dispatch console chrome</div></div>
+  <div class="swatch"><div class="chip" style="background:#F5F5F3; border-bottom:1px solid #D8D8D3"></div><div class="info"><div class="name">Off-white</div>#F5F5F3<br/>App background</div></div>
+  <div class="swatch"><div class="chip" style="background:#FFFFFF; border-bottom:1px solid #D8D8D3"></div><div class="info"><div class="name">White</div>#FFFFFF<br/>Cards, surfaces</div></div>
+  <div class="swatch"><div class="chip" style="background:#1A1A1A"></div><div class="info"><div class="name">Ink</div>#1A1A1A<br/>Body text on light</div></div>
+  <div class="swatch"><div class="chip" style="background:#2E6B4F"></div><div class="info"><div class="name">Muted green</div>#2E6B4F<br/>Resolved status only</div></div>
+</div>
+
+<h3>Button states (shade variation, not hue change)</h3>
+<table>
+  <tr><th>State</th><th>Primary (navy)</th><th>Panic (red)</th><th>Usage</th></tr>
+  <tr><td>Default</td><td>#1C2B45</td><td>#B3261E</td><td>Resting state</td></tr>
+  <tr><td>Pressed</td><td>#16223A</td><td>#8F1E18</td><td>Darker shade of the same hue while touching</td></tr>
+  <tr><td>Disabled</td><td>#6B7688</td><td>#C9B3B1</td><td>Desaturated shade, reduced contrast label, not-allowed cursor</td></tr>
+</table>
+
+<!-- ================================================================ 2 -->
+<h2>2. Core flow — trigger → confirm → send → status</h2>
+<div class="flow">
+  <div class="step"><strong>1. Home</strong><span>Location confirmed, panic button ready</span></div>
+  <div class="arrow">→</div>
+  <div class="step"><strong>2. Confirmation</strong><span>Press and hold 3 seconds (release cancels)</span></div>
+  <div class="arrow">→</div>
+  <div class="step"><strong>3. Send</strong><span>GPS + timestamp + profile snapshot → dispatch API</span></div>
+  <div class="arrow">→</div>
+  <div class="step"><strong>4. Status</strong><span>Live stages, ETA, PIN-guarded false-alarm cancel</span></div>
+</div>
+<div class="note"><strong>Accidental-trigger protection:</strong> the alert fires only after a deliberate continuous
+3-second hold. Releasing early — or dragging off the button — aborts with no side effects. A false alarm can be
+cancelled from the status screen, but only with the user's PIN.</div>
+
+<!-- ================================================================ 3 -->
+<h2>3. Screen wireframes</h2>
+<div class="screens">
+
+<!-- ---------------------------------------------------------------- Home -->
+<figure class="screen">
+  <svg viewBox="0 0 320 640" role="img" aria-label="Home and panic screen wireframe">
+    <rect x="1" y="1" width="318" height="638" rx="22" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="20" y="28" font-size="11" fill="#4A4E55">09:41</text>
+    <rect x="230" y="18" width="70" height="12" rx="3" fill="#ECECE8"/>
+
+    <!-- header -->
+    <rect x="14" y="42" width="292" height="58" rx="8" fill="#1C2B45"/>
+    <circle cx="40" cy="71" r="13" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
+    <text x="62" y="66" font-size="12.5" font-weight="700" fill="#FFFFFF">Sentinel Armed Response</text>
+    <text x="62" y="82" font-size="8.5" fill="#C9CEDA">ARMED RESPONSE — PRETORIA</text>
+    <rect x="248" y="58" width="46" height="26" rx="5" fill="none" stroke="#8FA0BC"/>
+
+    <!-- location card -->
+    <rect x="14" y="112" width="292" height="86" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="132" font-size="9" font-weight="700" fill="#6B6F76">CURRENT LOCATION</text>
+    <circle cx="36" cy="152" r="8" fill="none" stroke="#4A4E55" stroke-width="1.6"/>
+    <text x="52" y="150" font-size="11" font-weight="600" fill="#1A1A1A">Location confirmed</text>
+    <text x="52" y="165" font-size="9.5" fill="#6B6F76">42 Marthinus Pretorius St, Pretoria Central</text>
+    <rect x="28" y="174" width="66" height="18" rx="4" fill="#ECECE8"/>
+    <rect x="100" y="174" width="92" height="18" rx="4" fill="#ECECE8"/>
+
+    <!-- panic -->
+    <circle cx="160" cy="330" r="104" fill="none" stroke="#D8D8D3" stroke-width="5"/>
+    <circle cx="160" cy="330" r="88" fill="#B3261E"/>
+    <text x="160" y="318" text-anchor="middle" font-size="22" font-weight="700" fill="#FFFFFF" letter-spacing="2">PANIC</text>
+    <text x="160" y="340" text-anchor="middle" font-size="9.5" fill="#FFFFFF">Press and hold to alert</text>
+    <text x="160" y="354" text-anchor="middle" font-size="9.5" fill="#FFFFFF">security</text>
+    <text x="160" y="462" text-anchor="middle" font-size="10" fill="#6B6F76">Press and hold the button for three seconds.</text>
+    <text x="160" y="477" text-anchor="middle" font-size="10" fill="#6B6F76">Release at any time to cancel.</text>
+
+    <!-- emergency numbers -->
+    <rect x="14" y="498" width="292" height="82" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="518" font-size="9" font-weight="700" fill="#6B6F76">EMERGENCY NUMBERS</text>
+    <rect x="28" y="528" width="264" height="16" rx="3" fill="#ECECE8"/>
+    <rect x="28" y="550" width="264" height="16" rx="3" fill="#ECECE8"/>
+
+    <!-- bottom nav -->
+    <rect x="14" y="588" width="292" height="42" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <line x1="87" y1="588" x2="87" y2="630" stroke="#D8D8D3"/>
+    <line x1="160" y1="588" x2="160" y2="630" stroke="#D8D8D3"/>
+    <line x1="233" y1="588" x2="233" y2="630" stroke="#D8D8D3"/>
+
+    <!-- callouts -->
+    <circle cx="298" cy="112" r="9" fill="#1C2B45"/><text x="298" y="116" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">1</text>
+    <circle cx="252" cy="240" r="9" fill="#1C2B45"/><text x="252" y="244" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">2</text>
+    <circle cx="298" cy="498" r="9" fill="#1C2B45"/><text x="298" y="502" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">3</text>
+    <circle cx="298" cy="588" r="9" fill="#1C2B45"/><text x="298" y="592" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">4</text>
+  </svg>
+  <figcaption>
+    <h3>4.1 Home / Panic screen</h3>
+    <ul class="legend">
+      <li><span class="n">1</span><span>Location confirmation strip — detected address, accuracy, refresh and manual-address fallback.</span></li>
+      <li><span class="n">2</span><span>The panic button dominates the screen (≈260&nbsp;px target). Red appears nowhere else in the app.</span></li>
+      <li><span class="n">3</span><span>Emergency numbers (10111, 10177, control room) as direct dial links.</span></li>
+      <li><span class="n">4</span><span>Bottom navigation: Home · History · Profile · Settings (48&nbsp;px targets). Dispatch console is linked from the header.</span></li>
+    </ul>
+  </figcaption>
+</figure>
+
+<!-- -------------------------------------------------------- Confirmation -->
+<figure class="screen">
+  <svg viewBox="0 0 320 640" role="img" aria-label="Confirmation screen wireframe">
+    <rect x="1" y="1" width="318" height="638" rx="22" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="20" y="28" font-size="11" fill="#4A4E55">09:41</text>
+    <rect x="14" y="42" width="292" height="58" rx="8" fill="#1C2B45"/>
+    <circle cx="40" cy="71" r="13" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
+    <text x="62" y="66" font-size="12.5" font-weight="700" fill="#FFFFFF">Sentinel Armed Response</text>
+    <text x="62" y="82" font-size="8.5" fill="#C9CEDA">ARMED RESPONSE — PRETORIA</text>
+
+    <!-- dimmed location strip -->
+    <rect x="14" y="112" width="292" height="60" rx="8" fill="#ECECE8" stroke="#B9B9B3"/>
+
+    <!-- holding state -->
+    <circle cx="160" cy="330" r="104" fill="none" stroke="#D8D8D3" stroke-width="5"/>
+    <path d="M 160 226 A 104 104 0 0 1 262 300" fill="none" stroke="#B3261E" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="160" cy="330" r="88" fill="#8F1E18"/>
+    <text x="160" y="312" text-anchor="middle" font-size="19" font-weight="700" fill="#FFFFFF" letter-spacing="2">PANIC</text>
+    <text x="160" y="336" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF">Keep holding — 2s</text>
+    <text x="160" y="352" text-anchor="middle" font-size="9.5" fill="#FFFFFF">Release to cancel</text>
+
+    <rect x="46" y="466" width="228" height="52" rx="8" fill="#ECECE8"/>
+    <text x="160" y="488" text-anchor="middle" font-size="10" font-weight="600" fill="#1A1A1A">Keep holding for three seconds.</text>
+    <text x="160" y="504" text-anchor="middle" font-size="9.5" fill="#6B6F76">Your location and profile are sent to the control room.</text>
+
+    <rect x="14" y="588" width="292" height="42" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+
+    <circle cx="252" cy="240" r="9" fill="#1C2B45"/><text x="252" y="244" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">1</text>
+    <circle cx="272" cy="452" r="9" fill="#1C2B45"/><text x="272" y="456" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">2</text>
+  </svg>
+  <figcaption>
+    <h3>4.2 Confirmation — hold-to-activate state</h3>
+    <ul class="legend">
+      <li><span class="n">1</span><span>Hold-progress ring fills over 3 seconds; the button darkens one shade (#8F1E18). Countdown text replaces the instruction.</span></li>
+      <li><span class="n">2</span><span>Explicit “release to cancel” language. Any pointer-up, pointer-leave or scroll gesture aborts silently — no alert is sent.</span></li>
+    </ul>
+  </figcaption>
+</figure>
+
+<!-- -------------------------------------------------------------- Status -->
+<figure class="screen">
+  <svg viewBox="0 0 320 640" role="img" aria-label="Status screen wireframe">
+    <rect x="1" y="1" width="318" height="638" rx="22" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="20" y="28" font-size="11" fill="#4A4E55">09:42</text>
+
+    <!-- headline card -->
+    <rect x="14" y="42" width="292" height="112" rx="8" fill="#1C2B45"/>
+    <text x="28" y="64" font-size="8.5" fill="#C9CEDA">ALERT AR-261029-001</text>
+    <text x="28" y="88" font-size="17" font-weight="700" fill="#FFFFFF">Help is on the way</text>
+    <text x="28" y="106" font-size="9" fill="#C9CEDA">Sent 29/10/2026, 09:41</text>
+    <rect x="216" y="52" width="76" height="20" rx="10" fill="#FFFFFF"/>
+    <text x="254" y="66" text-anchor="middle" font-size="8" font-weight="700" fill="#1C2B45">EN ROUTE</text>
+    <text x="28" y="132" font-size="11" font-weight="600" fill="#FFFFFF">Estimated response time: 7 minutes</text>
+
+    <!-- stepper -->
+    <rect x="14" y="166" width="292" height="216" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="188" font-size="9" font-weight="700" fill="#6B6F76">RESPONSE PROGRESS</text>
+    <line x1="44" y1="212" x2="44" y2="352" stroke="#1C2B45" stroke-width="2"/>
+    <circle cx="44" cy="212" r="10" fill="#1C2B45"/><text x="44" y="216" text-anchor="middle" font-size="9" fill="#FFFFFF">✓</text>
+    <text x="66" y="209" font-size="11" font-weight="600" fill="#1A1A1A">Dispatch Notified</text>
+    <text x="66" y="223" font-size="8.5" fill="#6B6F76">29/10/2026, 09:41</text>
+    <circle cx="44" cy="262" r="11" fill="#FFFFFF" stroke="#1C2B45" stroke-width="3"/>
+    <text x="66" y="259" font-size="11" font-weight="600" fill="#1A1A1A">Responder En Route</text>
+    <text x="66" y="273" font-size="8.5" fill="#6B6F76">Unit R-14 dispatched · ETA 7 min</text>
+    <circle cx="44" cy="312" r="10" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="66" y="309" font-size="11" font-weight="500" fill="#6B6F76">Responder Arrived</text>
+    <circle cx="44" cy="352" r="10" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="66" y="349" font-size="11" font-weight="500" fill="#6B6F76">Resolved</text>
+
+    <!-- location -->
+    <rect x="14" y="394" width="292" height="74" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="414" font-size="9" font-weight="700" fill="#6B6F76">LOCATION SENT TO DISPATCH</text>
+    <text x="28" y="434" font-size="10.5" fill="#1A1A1A">42 Marthinus Pretorius St, Pretoria Central</text>
+    <text x="28" y="452" font-size="9" fill="#6B6F76">-25.74790, 28.18850 — accuracy 8 m</text>
+
+    <!-- actions -->
+    <rect x="14" y="482" width="292" height="44" rx="8" fill="#FFFFFF" stroke="#1C2B45" stroke-width="1.8"/>
+    <text x="160" y="509" text-anchor="middle" font-size="11" font-weight="600" fill="#1C2B45">Call control room</text>
+    <rect x="14" y="536" width="292" height="44" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="160" y="563" text-anchor="middle" font-size="11" font-weight="600" fill="#4A4E55">Cancel alert (false alarm) — PIN required</text>
+
+    <rect x="14" y="588" width="292" height="42" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+
+    <circle cx="298" cy="166" r="9" fill="#1C2B45"/><text x="298" y="170" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">1</text>
+    <circle cx="298" cy="394" r="9" fill="#1C2B45"/><text x="298" y="398" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">2</text>
+    <circle cx="298" cy="536" r="9" fill="#1C2B45"/><text x="298" y="540" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">3</text>
+  </svg>
+  <figcaption>
+    <h3>4.3 Live status screen</h3>
+    <ul class="legend">
+      <li><span class="n">1</span><span>Stage tracker updated in real time (WebSocket with polling fallback): Dispatch Notified → En Route → Arrived → Resolved, each time-stamped.</span></li>
+      <li><span class="n">2</span><span>Exact location sent to dispatch (address + coordinates + accuracy), with a link to open a map.</span></li>
+      <li><span class="n">3</span><span>False-alarm cancellation requires the 4-digit PIN and a reason. Cancelled alerts are recorded in the audit log.</span></li>
+    </ul>
+  </figcaption>
+</figure>
+
+<!-- -------------------------------------------------------------- Profile -->
+<figure class="screen">
+  <svg viewBox="0 0 320 640" role="img" aria-label="Profile screen wireframe">
+    <rect x="1" y="1" width="318" height="638" rx="22" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="20" y="28" font-size="11" fill="#4A4E55">09:45</text>
+    <rect x="14" y="42" width="292" height="58" rx="8" fill="#1C2B45"/>
+    <text x="62" y="66" font-size="12.5" font-weight="700" fill="#FFFFFF">Sentinel Armed Response</text>
+    <text x="62" y="82" font-size="8.5" fill="#C9CEDA">ARMED RESPONSE — PRETORIA</text>
+
+    <text x="20" y="126" font-size="15" font-weight="700" fill="#1A1A1A">Profile</text>
+    <text x="20" y="143" font-size="9" fill="#6B6F76">Attached to every alert sent to responders.</text>
+
+    <!-- personal -->
+    <rect x="14" y="156" width="292" height="132" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="176" font-size="9" font-weight="700" fill="#6B6F76">PERSONAL DETAILS</text>
+    <rect x="28" y="186" width="126" height="30" rx="5" fill="#ECECE8"/>
+    <rect x="166" y="186" width="126" height="30" rx="5" fill="#ECECE8"/>
+    <rect x="28" y="224" width="126" height="30" rx="5" fill="#ECECE8"/>
+    <rect x="166" y="224" width="126" height="30" rx="5" fill="#ECECE8"/>
+    <rect x="28" y="262" width="264" height="18" rx="4" fill="#ECECE8"/>
+
+    <!-- medical -->
+    <rect x="14" y="300" width="292" height="86" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="320" font-size="9" font-weight="700" fill="#6B6F76">MEDICAL INFORMATION (OPTIONAL)</text>
+    <rect x="28" y="330" width="264" height="18" rx="4" fill="#ECECE8"/>
+    <rect x="28" y="356" width="264" height="18" rx="4" fill="#ECECE8"/>
+
+    <!-- contacts -->
+    <rect x="14" y="398" width="292" height="118" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="418" font-size="9" font-weight="700" fill="#6B6F76">EMERGENCY CONTACTS</text>
+    <text x="278" y="418" text-anchor="end" font-size="8.5" fill="#6B6F76">2 of 3</text>
+    <rect x="28" y="428" width="264" height="34" rx="5" fill="#ECECE8"/>
+    <rect x="28" y="470" width="264" height="34" rx="5" fill="#ECECE8"/>
+
+    <!-- consent + save -->
+    <rect x="14" y="528" width="292" height="52" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <rect x="28" y="542" width="14" height="14" rx="3" fill="#1C2B45"/>
+    <text x="50" y="549" font-size="8.5" fill="#4A4E55">I consent to Sentinel processing my personal information</text>
+    <text x="50" y="562" font-size="8.5" fill="#4A4E55">for armed response purposes (POPIA).</text>
+    <rect x="14" y="588" width="292" height="42" rx="8" fill="#1C2B45"/>
+    <text x="160" y="614" text-anchor="middle" font-size="11" font-weight="600" fill="#FFFFFF">Save profile</text>
+  </svg>
+  <figcaption>
+    <h3>4.4 Profile screen</h3>
+    <ul class="legend">
+      <li><span class="n">1</span><span>Identity and contact fields (name, surname, SA ID number, mobile, residential address).</span></li>
+      <li><span class="n">2</span><span>Optional medical conditions and allergies — shared only with dispatched responders and the control room.</span></li>
+      <li><span class="n">3</span><span>Up to three emergency contacts (notified on activation) and the POPIA consent record with the privacy notice attached.</span></li>
+    </ul>
+  </figcaption>
+</figure>
+
+<!-- -------------------------------------------------------------- History -->
+<figure class="screen">
+  <svg viewBox="0 0 320 640" role="img" aria-label="History screen wireframe">
+    <rect x="1" y="1" width="318" height="638" rx="22" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="20" y="28" font-size="11" fill="#4A4E55">09:47</text>
+    <rect x="14" y="42" width="292" height="58" rx="8" fill="#1C2B45"/>
+    <text x="62" y="66" font-size="12.5" font-weight="700" fill="#FFFFFF">Sentinel Armed Response</text>
+    <text x="62" y="82" font-size="8.5" fill="#C9CEDA">ARMED RESPONSE — PRETORIA</text>
+
+    <text x="20" y="126" font-size="15" font-weight="700" fill="#1A1A1A">Alert history</text>
+
+    <text x="20" y="152" font-size="9" font-weight="700" fill="#6B6F76">MON, 12 OCT 2026</text>
+    <rect x="14" y="162" width="292" height="84" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="184" font-size="9" font-weight="600" fill="#6B6F76">AR-261012-001</text>
+    <rect x="228" y="172" width="64" height="18" rx="9" fill="#E2EEE8"/>
+    <text x="260" y="185" text-anchor="middle" font-size="8" font-weight="700" fill="#2E6B4F">RESOLVED</text>
+    <text x="28" y="208" font-size="11" font-weight="600" fill="#1A1A1A">21:14 · Panic alert</text>
+    <text x="28" y="226" font-size="9" fill="#6B6F76">Church Square, Pretoria Central, 0002</text>
+
+    <text x="20" y="274" font-size="9" font-weight="700" fill="#6B6F76">MON, 5 OCT 2026</text>
+    <rect x="14" y="284" width="292" height="84" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="306" font-size="9" font-weight="600" fill="#6B6F76">AR-261005-003</text>
+    <rect x="234" y="294" width="58" height="18" rx="9" fill="#ECECE8"/>
+    <text x="263" y="307" text-anchor="middle" font-size="8" font-weight="700" fill="#4A4E55">TEST</text>
+    <text x="28" y="330" font-size="11" font-weight="600" fill="#1A1A1A">09:05 · Test alert</text>
+    <text x="28" y="348" font-size="9" fill="#6B6F76">42 Marthinus Pretorius St, Pretoria Central</text>
+
+    <rect x="14" y="396" width="292" height="84" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="418" font-size="9" font-weight="600" fill="#6B6F76">AR-260928-002</text>
+    <rect x="228" y="406" width="64" height="18" rx="9" fill="#E2EEE8"/>
+    <text x="260" y="419" text-anchor="middle" font-size="8" font-weight="700" fill="#2E6B4F">RESOLVED</text>
+    <text x="28" y="442" font-size="11" font-weight="600" fill="#1A1A1A">18:42 · Panic alert</text>
+    <text x="28" y="460" font-size="9" fill="#6B6F76">Brooklyn Mall, Brooklyn, 0181</text>
+
+    <rect x="14" y="588" width="292" height="42" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+
+    <circle cx="298" cy="284" r="9" fill="#1C2B45"/><text x="298" y="288" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">1</text>
+    <circle cx="298" cy="396" r="9" fill="#1C2B45"/><text x="298" y="400" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">2</text>
+  </svg>
+  <figcaption>
+    <h3>4.5 History screen</h3>
+    <ul class="legend">
+      <li><span class="n">1</span><span>Chronological list grouped by day. Each row shows alert code, time, type, resolution status and address.</span></li>
+      <li><span class="n">2</span><span>Test alerts are labelled distinctly. Tapping a row opens the full status/audit detail — no clutter on the list itself.</span></li>
+    </ul>
+  </figcaption>
+</figure>
+
+<!-- ------------------------------------------------------------- Settings -->
+<figure class="screen">
+  <svg viewBox="0 0 320 640" role="img" aria-label="Settings screen wireframe">
+    <rect x="1" y="1" width="318" height="638" rx="22" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <text x="20" y="28" font-size="11" fill="#4A4E55">09:49</text>
+    <rect x="14" y="42" width="292" height="58" rx="8" fill="#1C2B45"/>
+    <text x="62" y="66" font-size="12.5" font-weight="700" fill="#FFFFFF">Sentinel Armed Response</text>
+    <text x="62" y="82" font-size="8.5" fill="#C9CEDA">ARMED RESPONSE — PRETORIA</text>
+
+    <text x="20" y="126" font-size="15" font-weight="700" fill="#1A1A1A">Settings</text>
+
+    <!-- PIN -->
+    <rect x="14" y="142" width="292" height="140" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="162" font-size="9" font-weight="700" fill="#6B6F76">SECURITY</text>
+    <rect x="28" y="172" width="264" height="28" rx="5" fill="#ECECE8"/>
+    <rect x="28" y="208" width="126" height="28" rx="5" fill="#ECECE8"/>
+    <rect x="166" y="208" width="126" height="28" rx="5" fill="#ECECE8"/>
+    <rect x="28" y="244" width="110" height="28" rx="6" fill="#FFFFFF" stroke="#1C2B45" stroke-width="1.6"/>
+    <text x="83" y="262" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1C2B45">Change PIN</text>
+
+    <!-- notifications -->
+    <rect x="14" y="294" width="292" height="132" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="314" font-size="9" font-weight="700" fill="#6B6F76">NOTIFICATIONS</text>
+    <rect x="28" y="326" width="180" height="10" rx="3" fill="#ECECE8"/>
+    <rect x="252" y="322" width="36" height="18" rx="9" fill="#1C2B45"/><circle cx="279" cy="331" r="7" fill="#FFFFFF"/>
+    <rect x="28" y="358" width="180" height="10" rx="3" fill="#ECECE8"/>
+    <rect x="252" y="354" width="36" height="18" rx="9" fill="#B9B9B3"/><circle cx="261" cy="363" r="7" fill="#FFFFFF"/>
+    <rect x="28" y="390" width="180" height="10" rx="3" fill="#ECECE8"/>
+    <rect x="252" y="386" width="36" height="18" rx="9" fill="#1C2B45"/><circle cx="279" cy="395" r="7" fill="#FFFFFF"/>
+
+    <!-- test -->
+    <rect x="14" y="438" width="292" height="86" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="458" font-size="9" font-weight="700" fill="#6B6F76">TESTING</text>
+    <text x="28" y="476" font-size="8.5" fill="#6B6F76">Sends a test signal to dispatch. No responders</text>
+    <text x="28" y="488" font-size="8.5" fill="#6B6F76">are dispatched.</text>
+    <rect x="28" y="496" width="118" height="22" rx="5" fill="#FFFFFF" stroke="#1C2B45" stroke-width="1.6"/>
+    <text x="87" y="511" text-anchor="middle" font-size="9" font-weight="600" fill="#1C2B45">Send test alert</text>
+
+    <!-- privacy -->
+    <rect x="14" y="536" width="292" height="80" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="28" y="556" font-size="9" font-weight="700" fill="#6B6F76">PRIVACY (POPIA)</text>
+    <rect x="28" y="566" width="120" height="20" rx="4" fill="#ECECE8"/>
+    <rect x="156" y="566" width="120" height="20" rx="4" fill="#ECECE8"/>
+    <rect x="28" y="592" width="120" height="20" rx="4" fill="#ECECE8"/>
+
+    <circle cx="298" cy="142" r="9" fill="#1C2B45"/><text x="298" y="146" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">1</text>
+    <circle cx="298" cy="294" r="9" fill="#1C2B45"/><text x="298" y="298" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">2</text>
+    <circle cx="298" cy="438" r="9" fill="#1C2B45"/><text x="298" y="442" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">3</text>
+    <circle cx="298" cy="536" r="9" fill="#1C2B45"/><text x="298" y="540" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">4</text>
+  </svg>
+  <figcaption>
+    <h3>4.6 Settings screen</h3>
+    <ul class="legend">
+      <li><span class="n">1</span><span>Change PIN (current PIN verified first; 4–6 digits).</span></li>
+      <li><span class="n">2</span><span>Notification preferences — SMS/WhatsApp for emergency contacts, status updates.</span></li>
+      <li><span class="n">3</span><span>Test alert — confirm modal, then a labelled test signal without dispatching responders.</span></li>
+      <li><span class="n">4</span><span>POPIA section: privacy notice plus access / correction / deletion request actions.</span></li>
+    </ul>
+  </figcaption>
+</figure>
+
+<!-- ------------------------------------------------------------- Dispatch -->
+<figure class="screen">
+  <svg viewBox="0 0 640 420" role="img" aria-label="Dispatch console wireframe">
+    <rect x="1" y="1" width="638" height="418" rx="14" fill="#FFFFFF" stroke="#B9B9B3" stroke-width="2"/>
+    <!-- header -->
+    <rect x="1" y="1" width="638" height="52" rx="14" fill="#2B2E33"/>
+    <text x="24" y="32" font-size="13" font-weight="700" fill="#FFFFFF">Sentinel Armed Response — Dispatch Console</text>
+    <rect x="470" y="14" width="90" height="24" rx="4" fill="#3A3E44"/>
+    <rect x="572" y="14" width="46" height="24" rx="4" fill="#3A3E44"/>
+
+    <!-- queue -->
+    <rect x="16" y="68" width="220" height="336" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <rect x="30" y="82" width="52" height="22" rx="11" fill="#1C2B45"/>
+    <rect x="90" y="82" width="52" height="22" rx="11" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <rect x="150" y="82" width="52" height="22" rx="11" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <rect x="30" y="118" width="192" height="72" rx="6" fill="#FFFFFF" stroke="#1C2B45" stroke-width="2"/>
+    <text x="42" y="140" font-size="10" font-weight="700" fill="#1A1A1A">Thandi Mokoena</text>
+    <text x="42" y="156" font-size="8" fill="#6B6F76">AR-261029-001 · 09:41</text>
+    <text x="42" y="172" font-size="8" fill="#6B6F76">42 Marthinus Pretorius St…</text>
+    <rect x="30" y="202" width="192" height="72" rx="6" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="42" y="224" font-size="10" font-weight="600" fill="#1A1A1A">Sipho Dlamini</text>
+    <text x="42" y="240" font-size="8" fill="#6B6F76">AR-261028-004 · 22:03</text>
+    <rect x="30" y="286" width="192" height="72" rx="6" fill="#FFFFFF" stroke="#B9B9B3"/>
+
+    <!-- map -->
+    <rect x="252" y="68" width="372" height="180" rx="8" fill="#ECECE8" stroke="#B9B9B3"/>
+    <path d="M 268 200 L 340 120 L 420 170 L 500 110 L 610 190" fill="none" stroke="#B9B9B3" stroke-width="3"/>
+    <path d="M 300 70 L 360 240 M 470 70 L 520 240" stroke="#D8D8D3" stroke-width="2"/>
+    <circle cx="440" cy="150" r="14" fill="#1C2B45"/>
+    <path d="M 440 136 l 9 4 v 8 c 0 6 -4 9.5 -9 11 c -5 -1.5 -9 -5 -9 -11 v -8 z" fill="#FFFFFF" transform="scale(0.75) translate(146 50)"/>
+    <circle cx="330" cy="180" r="12" fill="#2B2E33"/>
+    <text x="268" y="236" font-size="8.5" fill="#6B6F76">Live map — OpenStreetMap tiles, alert markers with client identity</text>
+
+    <!-- detail -->
+    <rect x="252" y="262" width="372" height="142" rx="8" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="268" y="284" font-size="10" font-weight="700" fill="#1A1A1A">AR-261029-001 — Thandi Mokoena</text>
+    <rect x="560" y="272" width="52" height="18" rx="9" fill="#1C2B45"/>
+    <text x="586" y="285" text-anchor="middle" font-size="7.5" font-weight="700" fill="#FFFFFF">EN ROUTE</text>
+    <rect x="268" y="296" width="150" height="8" rx="3" fill="#ECECE8"/>
+    <rect x="268" y="312" width="150" height="8" rx="3" fill="#ECECE8"/>
+    <rect x="268" y="328" width="150" height="8" rx="3" fill="#ECECE8"/>
+    <rect x="436" y="296" width="170" height="8" rx="3" fill="#ECECE8"/>
+    <rect x="436" y="312" width="170" height="8" rx="3" fill="#ECECE8"/>
+    <rect x="268" y="352" width="110" height="28" rx="6" fill="#1C2B45"/>
+    <text x="323" y="370" text-anchor="middle" font-size="9" font-weight="600" fill="#FFFFFF">Mark arrived</text>
+    <rect x="388" y="352" width="110" height="28" rx="6" fill="#FFFFFF" stroke="#1C2B45" stroke-width="1.6"/>
+    <text x="443" y="370" text-anchor="middle" font-size="9" font-weight="600" fill="#1C2B45">Resolve</text>
+    <rect x="508" y="352" width="98" height="28" rx="6" fill="#FFFFFF" stroke="#B9B9B3"/>
+    <text x="557" y="370" text-anchor="middle" font-size="9" font-weight="600" fill="#4A4E55">Call client</text>
+
+    <circle cx="236" cy="68" r="9" fill="#1C2B45"/><text x="236" y="72" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">1</text>
+    <circle cx="612" cy="68" r="9" fill="#1C2B45"/><text x="612" y="72" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">2</text>
+    <circle cx="612" cy="262" r="9" fill="#1C2B45"/><text x="612" y="266" text-anchor="middle" font-size="10" font-weight="700" fill="#FFFFFF">3</text>
+  </svg>
+  <figcaption>
+    <h3>4.7 Dispatch console (control room — desktop)</h3>
+    <ul class="legend">
+      <li><span class="n">1</span><span>Alert queue: active / tests / all filters, sorted newest first. New alerts appear instantly and auto-select.</span></li>
+      <li><span class="n">2</span><span>Map of the client's location (OpenStreetMap) with markers for every alert in view.</span></li>
+      <li><span class="n">3</span><span>Client detail (identity, contract, medical summary, contacts) with response actions: en route (with ETA + unit), arrived, resolve, call client. Every action is written to the audit log.</span></li>
+    </ul>
+  </figcaption>
+</figure>
+
+</div>
+
+<!-- ================================================================ 5 -->
+<h2>5. Accessibility &amp; compliance notes</h2>
+<ul class="rules">
+  <li>All text/background pairs meet WCAG&nbsp;AA (≥4.5:1 body, ≥3:1 large text). Status is never conveyed by colour alone — icons and labels accompany every badge.</li>
+  <li>The panic action is reachable by keyboard (Enter/Space activation) and screen readers (explicit aria-label with hold instruction).</li>
+  <li>Reduced-motion preference disables the hold-progress transition; the countdown text still communicates remaining time.</li>
+  <li>POPIA: consent is captured explicitly with a timestamp; location is only captured on alert/test; medical data is visible only to responders and the control room; access/correction/deletion requests are first-class UI actions backed by an auditable log.</li>
+  <li>False-alarm cancellation is PIN-protected to prevent misuse (spec requirement), and every status change is written to an immutable event log.</li>
+</ul>
+
+<footer class="doc-foot">
+  Wireframes v1.0 — Sentinel Armed Response panic button application. Company name and logo are placeholders pending
+  final branding. These wireframes correspond directly to the implemented prototype in this repository
+  (client/src/screens).
+</footer>
+
+</div>
+</body>
+</html>
