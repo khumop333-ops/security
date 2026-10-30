@@ -192,10 +192,11 @@ async function seedIfEmpty() {
     );
     const alertId = rows[0]?.id;
     if (!alertId) continue; // already seeded by another instance
-    await addEvent(alertId, null, 'dispatch_notified', 'system', 'Dispatch', 'Alert received by control room.', h.created);
-    await addEvent(alertId, 'dispatch_notified', 'responder_en_route', 'control_room', 'Control room', 'Responder dispatched.', h.created);
-    await addEvent(alertId, 'responder_en_route', 'responder_arrived', 'control_room', 'Control room', 'Responder on scene.', h.created);
-    await addEvent(alertId, 'responder_arrived', h.status, 'control_room', 'Control room', h.note, h.created);
+    // Raw event writes (not addEvent) — this runs inside the initialiser.
+    await writeEvent(sql, alertId, null, 'dispatch_notified', 'system', 'Dispatch', 'Alert received by control room.', h.created);
+    await writeEvent(sql, alertId, 'dispatch_notified', 'responder_en_route', 'control_room', 'Control room', 'Responder dispatched.', h.created);
+    await writeEvent(sql, alertId, 'responder_en_route', 'responder_arrived', 'control_room', 'Control room', 'Responder on scene.', h.created);
+    await writeEvent(sql, alertId, 'responder_arrived', h.status, 'control_room', 'Control room', h.note, h.created);
   }
 }
 
@@ -302,7 +303,6 @@ export async function logDataRequest(requestType, detail) {
 /* ----------------------------------------------------------------- alerts */
 
 export async function nextAlertCode(ex = sql) {
-  await init();
   const d = new Date();
   const ymd = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
   const rows = await ex.unsafe("SELECT COUNT(*) AS c FROM alerts WHERE code LIKE $1", [`AR-${ymd}-%`]);
@@ -403,13 +403,21 @@ export async function getActiveAlert() {
   return rows[0] || null;
 }
 
-export async function addEvent(alertId, fromStatus, toStatus, actor, actorName, note, createdAt) {
-  await init();
-  await sql.unsafe(
+/**
+ * Insert an alert event on the given executor. Does NOT call init() so it can
+ * be used from within the initialiser itself (seedIfEmpty) without deadlocking.
+ */
+async function writeEvent(ex, alertId, fromStatus, toStatus, actor, actorName, note, createdAt) {
+  await ex.unsafe(
     `INSERT INTO alert_events (alert_id, from_status, to_status, actor, actor_name, note, created_at)
      VALUES ($1, $2, $3, $4, $5, $6, $7)`,
     [alertId, fromStatus ?? null, toStatus, actor, actorName || '', note || '', createdAt || nowIso()]
   );
+}
+
+export async function addEvent(alertId, fromStatus, toStatus, actor, actorName, note, createdAt) {
+  await init();
+  return writeEvent(sql, alertId, fromStatus, toStatus, actor, actorName, note, createdAt);
 }
 
 export async function listEvents(alertId) {
