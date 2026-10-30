@@ -3,7 +3,7 @@
  */
 import { Router } from 'express';
 import {
-  ACTIVE_STATUSES, addEvent, createAlert, getActiveAlert, getAlert, getPinHash,
+  ACTIVE_STATUSES, createAlert, getActiveAlert, getAlert, getPinHash,
   listAlerts, listEvents, updateAlertStatus, verifyPin
 } from '../db.js';
 import { broadcast } from '../ws-hub.js';
@@ -17,7 +17,7 @@ function badRequest(res, message, code = 'BAD_REQUEST') {
 
 /* ----------------------------------------------------------- create alert */
 
-router.post('/alerts', (req, res) => {
+router.post('/alerts', async (req, res) => {
   const { type = 'panic', lat, lng, accuracy, address, addressSource } = req.body || {};
 
   if (!['panic', 'test'].includes(type)) {
@@ -25,7 +25,7 @@ router.post('/alerts', (req, res) => {
   }
 
   // One active panic at a time — matches the app's single-alert state machine.
-  const active = getActiveAlert();
+  const active = await getActiveAlert();
   if (active) {
     return res.status(409).json({
       error: {
@@ -36,7 +36,7 @@ router.post('/alerts', (req, res) => {
     });
   }
 
-  const alert = createAlert({
+  const alert = await createAlert({
     type,
     lat: typeof lat === 'number' ? lat : null,
     lng: typeof lng === 'number' ? lng : null,
@@ -46,43 +46,43 @@ router.post('/alerts', (req, res) => {
   });
 
   broadcast({ type: 'alert.created', alert });
-  return res.status(201).json({ alert, events: listEvents(alert.id) });
+  return res.status(201).json({ alert, events: await listEvents(alert.id) });
 });
 
 /* --------------------------------------------------------------- queries */
 
-router.get('/alerts/active', (req, res) => {
-  const alert = getActiveAlert();
+router.get('/alerts/active', async (req, res) => {
+  const alert = await getActiveAlert();
   return res.json({ alert: alert || null });
 });
 
-router.get('/alerts', (req, res) => {
+router.get('/alerts', async (req, res) => {
   const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
   const offset = parseInt(req.query.offset, 10) || 0;
-  return res.json({ alerts: listAlerts({ limit, offset }) });
+  return res.json({ alerts: await listAlerts({ limit, offset }) });
 });
 
-router.get('/alerts/:id', (req, res) => {
-  const alert = getAlert(Number(req.params.id));
+router.get('/alerts/:id', async (req, res) => {
+  const alert = await getAlert(Number(req.params.id));
   if (!alert) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Alert not found.' } });
-  return res.json({ alert, events: listEvents(alert.id) });
+  return res.json({ alert, events: await listEvents(alert.id) });
 });
 
 /* ------------------------------------------------- cancel (false alarm) */
 
-router.post('/alerts/:id/cancel', (req, res) => {
-  const alert = getAlert(Number(req.params.id));
+router.post('/alerts/:id/cancel', async (req, res) => {
+  const alert = await getAlert(Number(req.params.id));
   if (!alert) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Alert not found.' } });
 
   const { pin, reason } = req.body || {};
-  if (!pin || !verifyPin(pin, getPinHash())) {
+  if (!pin || !verifyPin(pin, await getPinHash())) {
     return res.status(401).json({ error: { code: 'INVALID_PIN', message: 'Incorrect PIN.' } });
   }
   if (!ACTIVE_STATUSES.includes(alert.status)) {
     return res.status(409).json({ error: { code: 'NOT_ACTIVE', message: 'This alert is no longer active.' } });
   }
 
-  const updated = updateAlertStatus(alert.id, {
+  const updated = await updateAlertStatus(alert.id, {
     status: 'cancelled',
     actor: 'user',
     operatorName: 'Client (PIN verified)',
@@ -91,7 +91,7 @@ router.post('/alerts/:id/cancel', (req, res) => {
   });
 
   broadcast({ type: 'alert.updated', alert: updated });
-  return res.json({ alert: updated, events: listEvents(updated.id) });
+  return res.json({ alert: updated, events: await listEvents(updated.id) });
 });
 
 export default router;

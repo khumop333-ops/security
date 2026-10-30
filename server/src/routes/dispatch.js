@@ -15,19 +15,19 @@ const router = Router();
 /** Statuses the control room may set, and what the client UI labels them. */
 const DISPATCHABLE_STATUSES = ['responder_en_route', 'responder_arrived', 'resolved', 'cancelled'];
 
-router.get('/dispatch/alerts', (req, res) => {
+router.get('/dispatch/alerts', async (req, res) => {
   const filter = ['active', 'test', 'recent'].includes(req.query.filter) ? req.query.filter : undefined;
-  const alerts = listAlerts({ limit: 100, filter });
+  const alerts = await listAlerts({ limit: 100, filter });
   return res.json({ alerts });
 });
 
-router.get('/dispatch/alerts/:id', (req, res) => {
-  const alert = getAlert(Number(req.params.id));
+router.get('/dispatch/alerts/:id', async (req, res) => {
+  const alert = await getAlert(Number(req.params.id));
   if (!alert) return res.status(404).json({ error: { code: 'NOT_FOUND', message: 'Alert not found.' } });
-  return res.json({ alert, events: listEvents(alert.id) });
+  return res.json({ alert, events: await listEvents(alert.id) });
 });
 
-router.post('/dispatch/alerts/:id/status', (req, res) => {
+router.post('/dispatch/alerts/:id/status', async (req, res) => {
   const {
     status, etaMinutes, responderName, responderUnit, note, operatorName, cancelReason
   } = req.body || {};
@@ -39,7 +39,7 @@ router.post('/dispatch/alerts/:id/status', (req, res) => {
   }
 
   try {
-    const alert = updateAlertStatus(Number(req.params.id), {
+    const alert = await updateAlertStatus(Number(req.params.id), {
       status,
       etaMinutes: Number.isFinite(Number(etaMinutes)) ? Math.max(0, Math.round(Number(etaMinutes))) : null,
       responderName: String(responderName || '').slice(0, 120),
@@ -50,7 +50,7 @@ router.post('/dispatch/alerts/:id/status', (req, res) => {
       actor: 'control_room'
     });
     broadcast({ type: 'alert.updated', alert });
-    return res.json({ alert, events: listEvents(alert.id) });
+    return res.json({ alert, events: await listEvents(alert.id) });
   } catch (err) {
     return res.status(err.statusCode || 500).json({
       error: { code: err.code || 'SERVER_ERROR', message: err.message }
@@ -63,7 +63,7 @@ router.post('/dispatch/alerts/:id/status', (req, res) => {
  * so the dispatch queue can be exercised without a second device. Clearly
  * flagged as a simulation in the UI.
  */
-router.post('/dispatch/simulate', (req, res) => {
+router.post('/dispatch/simulate', async (req, res) => {
   const operatorName = String((req.body || {}).operatorName || '').slice(0, 120);
 
   // Random point around Pretoria CBD / Hatfield / Brooklyn.
@@ -76,7 +76,7 @@ router.post('/dispatch/simulate', (req, res) => {
   const anchor = anchors[Math.floor(Math.random() * anchors.length)];
   const jitter = (n) => n + (Math.random() - 0.5) * 0.01;
 
-  const alert = createAlert({
+  const alert = await createAlert({
     type: 'panic',
     lat: jitter(anchor.lat),
     lng: jitter(anchor.lng),
@@ -88,11 +88,11 @@ router.post('/dispatch/simulate', (req, res) => {
   broadcast({ type: 'alert.created', alert });
   if (operatorName) {
     // Note who ran the simulation for the audit trail.
-    addEvent(alert.id, 'dispatch_notified', 'dispatch_notified', 'control_room', operatorName,
+    await addEvent(alert.id, 'dispatch_notified', 'dispatch_notified', 'control_room', operatorName,
       'Demo simulation generated from dispatch console.');
   }
 
-  return res.status(201).json({ alert, events: listEvents(alert.id) });
+  return res.status(201).json({ alert, events: await listEvents(alert.id) });
 });
 
 export default router;

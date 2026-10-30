@@ -2,6 +2,7 @@
   "name": "sentinel-panic-button",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Panic button application for a Pretoria private security company (client + dispatch backend)",
   "workspaces": [
     "server",

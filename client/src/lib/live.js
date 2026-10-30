@@ -73,11 +73,16 @@ export function createLiveClient({ onMessage, onStatus }) {
     socket.onclose = () => {
       clearTimeout(openFallbackTimer);
       if (closed) return;
-      emitStatus('reconnecting');
+      // Polling keeps data fresh regardless; report that honestly rather than
+      // a permanent "reconnecting" state (e.g. on Vercel where WS is unavailable).
       startPolling();
+      emitStatus('polling');
       attempts += 1;
-      const delay = Math.min(1000 * 2 ** attempts, 15000);
-      reconnectTimer = setTimeout(connect, delay);
+      // A few background reconnect attempts; polling carries the load after that.
+      if (attempts <= 5) {
+        const delay = Math.min(1000 * 2 ** attempts, 15000);
+        reconnectTimer = setTimeout(connect, delay);
+      }
     };
 
     socket.onerror = () => {

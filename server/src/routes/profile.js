@@ -17,11 +17,11 @@ const PROFILE_FIELDS = [
   'popia_consent'
 ];
 
-router.get('/profile', (req, res) => {
-  return res.json({ profile: getProfile(), contacts: listContacts() });
+router.get('/profile', async (req, res) => {
+  return res.json({ profile: await getProfile(), contacts: await listContacts() });
 });
 
-router.put('/profile', (req, res) => {
+router.put('/profile', async (req, res) => {
   const { profile: profileUpdate, contacts } = req.body || {};
 
   const fields = {};
@@ -33,19 +33,19 @@ router.put('/profile', (req, res) => {
 
   // POPIA: consent is recorded with a timestamp so it can be audited.
   if (fields.popia_consent === true || fields.popia_consent === 1) {
-    fields.popia_consent_at = getProfile().popia_consent_at || new Date().toISOString();
+    fields.popia_consent_at = (await getProfile()).popia_consent_at || new Date().toISOString();
   }
 
-  const profile = updateProfile(fields);
+  const profile = await updateProfile(fields);
 
-  let savedContacts = listContacts();
+  let savedContacts = await listContacts();
   if (Array.isArray(contacts)) {
     if (contacts.length > 3) {
       return res.status(400).json({
         error: { code: 'TOO_MANY_CONTACTS', message: 'A maximum of 3 emergency contacts is supported.' }
       });
     }
-    savedContacts = replaceContacts(contacts.map((c) => ({
+    savedContacts = await replaceContacts(contacts.map((c) => ({
       name: String(c.name || '').slice(0, 120),
       phone: String(c.phone || '').slice(0, 40),
       relationship: String(c.relationship || '').slice(0, 80)
@@ -57,17 +57,17 @@ router.put('/profile', (req, res) => {
 
 /* --------------------------------------------------------------- PIN */
 
-router.post('/pin/verify', (req, res) => {
+router.post('/pin/verify', async (req, res) => {
   const { pin } = req.body || {};
-  const ok = Boolean(pin) && verifyPin(pin, getPinHash());
+  const ok = Boolean(pin) && verifyPin(pin, await getPinHash());
   return res.status(ok ? 200 : 401).json(
     ok ? { ok: true } : { error: { code: 'INVALID_PIN', message: 'Incorrect PIN.' } }
   );
 });
 
-router.put('/pin', (req, res) => {
+router.put('/pin', async (req, res) => {
   const { currentPin, newPin } = req.body || {};
-  if (!currentPin || !verifyPin(currentPin, getPinHash())) {
+  if (!currentPin || !verifyPin(currentPin, await getPinHash())) {
     return res.status(401).json({ error: { code: 'INVALID_PIN', message: 'Current PIN is incorrect.' } });
   }
   const pinText = String(newPin ?? '');
@@ -76,13 +76,13 @@ router.put('/pin', (req, res) => {
       error: { code: 'INVALID_NEW_PIN', message: 'New PIN must be 4 to 6 digits.' }
     });
   }
-  setPin(pinText);
+  await setPin(pinText);
   return res.json({ ok: true });
 });
 
 /* ------------------------------------------------------- POPIA requests */
 
-router.post('/privacy/requests', (req, res) => {
+router.post('/privacy/requests', async (req, res) => {
   const { requestType, detail } = req.body || {};
   const allowed = ['access', 'deletion', 'correction'];
   if (!allowed.includes(requestType)) {
@@ -90,7 +90,7 @@ router.post('/privacy/requests', (req, res) => {
       error: { code: 'INVALID_REQUEST_TYPE', message: `Request type must be one of: ${allowed.join(', ')}.` }
     });
   }
-  logDataRequest(requestType, String(detail || '').slice(0, 1000));
+  await logDataRequest(requestType, String(detail || '').slice(0, 1000));
   return res.status(201).json({
     ok: true,
     message: 'Your request has been logged. The information officer will contact you within 30 days as required by POPIA.'
