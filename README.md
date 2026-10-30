@@ -14,6 +14,7 @@ situations — corporate visual language, no decoration, large tap targets.
 
 - [What is included](#what-is-included)
 - [Screens](#screens)
+- [Live deployment (Vercel)](#live-deployment-vercel)
 - [Quick start](#quick-start)
 - [Demo walkthrough](#demo-walkthrough)
 - [Architecture](#architecture)
@@ -61,6 +62,31 @@ situations — corporate visual language, no decoration, large tap targets.
 - `/profile` — Profile, medical info, emergency contacts, POPIA consent
 - `/settings` — PIN, notifications, test alert, privacy requests
 - `/dispatch` — Control-room dispatch console (desktop layout, live map)
+
+## Live deployment (Vercel)
+
+**URL:** <https://sentinel-armed-response.vercel.app>
+
+| Piece | Where it runs |
+|---|---|
+| React client (static build) | Vercel CDN (`client/dist`) |
+| API (Express serverless function) | Vercel Functions, Frankfurt region (`fra1`) — closest available to South Africa |
+| Database | Supabase Postgres (project `fxedufukvxsuaqhxkdad`, eu-west-1), dedicated role `sentinel_app` |
+| Live updates | Polling fallback (Vercel has no WebSockets) — the status screen reports "Polling" honestly |
+
+Configuration lives in `vercel.json` (build command, output directory, `/api`
+and SPA rewrites, function sizing/region) and the Vercel project's
+`DATABASE_URL` environment variable. Storage is selected automatically in
+`server/src/db.js`: Postgres when `DATABASE_URL` is set, SQLite otherwise.
+
+Deployment notes learned while building this:
+
+- Supabase's direct connection host (`db.<ref>.supabase.co`) is **IPv6-only**;
+  Vercel functions cannot resolve it. Use the shared pooler
+  (`aws-0-<region>.pooler.supabase.com:6543`) with the username format
+  `<role>.<project-ref>` for custom roles.
+- Pushing to the connected GitHub repository builds automatically; production
+  deployments are created explicitly from the branch/commit to be promoted.
 
 ## Quick start
 
@@ -198,8 +224,9 @@ a first-class requirement:
 The prototype deliberately leaves these as integration points (marked in the
 code):
 
-1. **Database** — migrate `server/src/db.js` to PostgreSQL (schema maps 1:1;
-   ISO timestamps, integer booleans, append-only event table).
+1. **Database** — the PostgreSQL driver (`server/src/db-pg.js`) is production-
+   ready and used on Vercel; for self-hosted deployments point `DATABASE_URL`
+   at any Postgres 14+ (the schema maps 1:1 to the SQLite version).
 2. **Notifications** — replace the simulated gateway in `db.js`/`StatusScreen`
    with an SMS/WhatsApp provider (e.g. BulkSMS, Clickatell, Twilio) and push
    via Firebase Cloud Messaging.
@@ -208,8 +235,10 @@ code):
 4. **Mobile** — the client is a mobile-first web app (installable as a PWA);
    port to React Native for store distribution using the same API. Native
    geolocation + background location improve reliability.
-5. **Hosting** — deploy in South Africa (e.g. AWS `af-south-1` Cape Town) for
-   low latency; TLS everywhere; WAF in front of the dispatch console.
+5. **Hosting** — the live demo runs on Vercel (functions in `fra1`, Frankfurt)
+   with Supabase Postgres in `eu-west-1`; for full POPIA data residency,
+   self-host in South Africa (e.g. AWS `af-south-1` Cape Town) with TLS
+   everywhere and a WAF in front of the dispatch console.
 6. **Reverse geocoding** — self-host Nominatim or use a commercial provider;
    the current browser-side lookup is best-effort and degrades to coordinates
    plus manual address entry.
