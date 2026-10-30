@@ -105,14 +105,20 @@ const SCHEMA_STATEMENTS = [
 /** Schema + demo seed, created lazily on first query and memoised. */
 let ready = null;
 function init() {
-  ready ??= (async () => {
-    // One statement per call — the extended query protocol rejects batches.
-    for (const statement of SCHEMA_STATEMENTS) {
-      await sql.unsafe(statement);
-    }
-    await seedIfEmpty();
-  })();
+  ready ??= doInit().catch((err) => {
+    // Allow a later request to retry (e.g. transient connection failure).
+    ready = null;
+    throw err;
+  });
   return ready;
+}
+
+async function doInit() {
+  // One statement per call — the extended query protocol rejects batches.
+  for (const statement of SCHEMA_STATEMENTS) {
+    await sql.unsafe(statement);
+  }
+  await seedIfEmpty();
 }
 
 /* ------------------------------------------------------------------- seed */
@@ -177,13 +183,15 @@ async function seedIfEmpty() {
          eta_minutes, responder_name, responder_unit, resolution_note,
          created_at, updated_at
        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+       ON CONFLICT (code) DO NOTHING
        RETURNING id`,
       [h.code, h.type, h.status, h.lat, h.lng, h.accuracy, h.address, h.address_source,
        'Thandi Mokoena', '9001155800081', '+27 82 555 0147', 'AR-PTA-104729',
        'Hypertension — takes enalapril 10 mg daily | Allergies: Penicillin',
        h.eta, h.responder, '', h.note, h.created, h.created]
     );
-    const alertId = rows[0].id;
+    const alertId = rows[0]?.id;
+    if (!alertId) continue; // already seeded by another instance
     await addEvent(alertId, null, 'dispatch_notified', 'system', 'Dispatch', 'Alert received by control room.', h.created);
     await addEvent(alertId, 'dispatch_notified', 'responder_en_route', 'control_room', 'Control room', 'Responder dispatched.', h.created);
     await addEvent(alertId, 'responder_en_route', 'responder_arrived', 'control_room', 'Control room', 'Responder on scene.', h.created);
