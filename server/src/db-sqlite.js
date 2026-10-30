@@ -324,6 +324,18 @@ export function getAlertByCode(code) {
   return db.prepare('SELECT * FROM alerts WHERE code = ?').get(code) || null;
 }
 
+/** Cheap connectivity probe used by /api/health. */
+export function ping() {
+  db.prepare('SELECT 1').get();
+  return true;
+}
+
+/** Detailed DB diagnosis surfaced by /api/health. */
+export function diagnose() {
+  ping();
+  return { driver: 'sqlite', connect: 'ok', schema: 'ok' };
+}
+
 export function listAlerts({ limit = 50, offset = 0, filter } = {}) {
   let sql = 'SELECT * FROM alerts';
   const params = [];

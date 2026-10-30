@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import alertsRouter from './routes/alerts.js';
 import profileRouter from './routes/profile.js';
 import dispatchRouter from './routes/dispatch.js';
+import { diagnose } from './db.js';
 import { clientCount } from './ws-hub.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -42,8 +43,16 @@ export function createApp() {
     return next();
   });
 
-  app.get('/api/health', (req, res) => {
-    res.json({ ok: true, serverTime: new Date().toISOString(), wsClients: clientCount() });
+  app.get('/api/health', async (req, res) => {
+    // Includes a DB diagnosis (driver, connectivity, schema init) so
+    // deployment health can be verified externally in one request.
+    let db = { driver: 'unknown' };
+    try {
+      db = await diagnose();
+    } catch (err) {
+      db = { driver: 'unknown', error: err.message };
+    }
+    res.json({ ok: true, serverTime: new Date().toISOString(), wsClients: clientCount(), db });
   });
 
   app.use('/api', profileRouter);

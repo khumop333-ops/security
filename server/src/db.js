@@ -33,3 +33,5 @@ export const getActiveAlert = impl.getActiveAlert;
 export const addEvent = impl.addEvent;
 export const listEvents = impl.listEvents;
 export const updateAlertStatus = impl.updateAlertStatus;
+export const ping = impl.ping;
+export const diagnose = impl.diagnose;
